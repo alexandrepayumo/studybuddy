@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useState } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar';
+import { useUser} from "@auth0/nextjs-auth0/client";
 import { LogoutButton } from '@/components/buttons/logout-button';
 
 const Container = styled.div`
@@ -65,6 +66,7 @@ const Button = styled.button`
 `;
 
 const Dashboard = () => {
+  
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState(null);
 
@@ -91,6 +93,7 @@ const Dashboard = () => {
       setApiResponse('Error fetching data from Google Gemini API: ' + error.message);
     }
   };
+  
 
   const createCalendarEvent = async () => {
     try {
@@ -114,6 +117,7 @@ const Dashboard = () => {
   };
 
   return (
+   
     <Container>
       <Head>
         <title>Dashboard</title>
@@ -123,7 +127,7 @@ const Dashboard = () => {
       </Head>
 
       <NavBar />
-
+      
       <Main>
         <Title>Dashboard</Title>
         <Description>Welcome to your dashboard.</Description>
@@ -143,6 +147,8 @@ const Dashboard = () => {
         )}
 
         <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
+        
+        
         <LogoutButton></LogoutButton>
       </Main>
     </Container>
