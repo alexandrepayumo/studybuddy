@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             "description": "Description of the event",
             "start": "Start time and date of the event (e.g., 2024-03-10T10:00:00-07:00)",
             "end": "End time and date of the event (e.g., 2024-03-10T12:00:00-07:00)",
-            "event_type": "start/stop/modify" // Specify whether the event is being created, cancelled, or modified
+            "event_type": "create/delete/modify" // Specify whether the event is being created, cancelled, or modified
           },
           {
             "summary": "Summary of another event",
