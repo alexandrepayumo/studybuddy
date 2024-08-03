@@ -65,10 +65,51 @@ const Button = styled.button`
 
 const Dashboard = () => {
   const [text, setText] = useState('');
+  const [apiResponse, setApiResponse] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // For now, do nothing on submit
+
+    try {
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Request failed with status ' + response.status);
+      }
+
+      const data = await response.json();
+      setApiResponse(data.content);
+    } catch (error) {
+      console.error(error);
+      setApiResponse('Error fetching data from Google Gemini API: ' + error.message);
+    }
+  };
+
+  const createCalendarEvent = async () => {
+    try {
+      const response = await fetch('/api/create-event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Request failed with status ' + response.status);
+      }
+
+      const data = await response.json();
+      alert(`Event created: ${data.eventLink}`);
+    } catch (error) {
+      console.error(error);
+      alert('Error creating event: ' + error.message);
+    }
   };
 
   return (
@@ -94,6 +135,12 @@ const Dashboard = () => {
           />
           <Button type="submit">Submit</Button>
         </Form>
+
+        {apiResponse !== null && (
+          <p>Response from Google Gemini: {apiResponse}</p>
+        )}
+
+        <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
       </Main>
     </Container>
   );
