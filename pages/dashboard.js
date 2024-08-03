@@ -30,10 +30,8 @@ const Dashboard = () => {
   const [apiResponse, setApiResponse] = useState([]);
   const [calendarChanges, setCalendarChanges] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: isErrorOpen, onOpen: onErrorOpen, onClose: onErrorClose } = useDisclosure();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -52,17 +50,10 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-
-      if (data.content.response) {
-        // Handle special message
-        setErrorMessage(data.content.response);
-        onErrorOpen();
-      } else {
-        // Handle JSON array of events
-        setApiResponse(data.content || []);
-        setCalendarChanges(data.content || []);
-        onOpen(); // Open the confirmation dialog
-      }
+      console.log('API response:', data); // Log the response for debugging
+      setApiResponse(data.content || []); // Set response data
+      setCalendarChanges(data.content || []); // Prepare for confirmation
+      onOpen(); // Open the confirmation dialog
     } catch (error) {
       console.error(error);
       setApiResponse(['Error fetching data from Google Gemini API: ' + error.message]);
@@ -176,23 +167,6 @@ const Dashboard = () => {
               </Button>
               <Button variant="outline" onClick={onClose}>
                 No, Cancel
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        {/* Error Modal */}
-        <Modal isOpen={isErrorOpen} onClose={onErrorClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Information</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>{errorMessage}</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" onClick={onErrorClose}>
-                Go Back to Dashboard
               </Button>
             </ModalFooter>
           </ModalContent>
