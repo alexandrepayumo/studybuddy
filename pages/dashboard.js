@@ -30,6 +30,7 @@ const Dashboard = () => {
   const [apiResponse, setApiResponse] = useState([]);
   const [calendarChanges, setCalendarChanges] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [invalidResponse, setInvalidResponse] = useState(false);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -51,12 +52,32 @@ const Dashboard = () => {
 
       const data = await response.json();
       console.log('API response:', data); // Log the response for debugging
-      setApiResponse(data.content || []); // Set response data
-      setCalendarChanges(data.content || []); // Prepare for confirmation
-      onOpen(); // Open the confirmation dialog
+      console.log('data.content: ', data.content);
+      console.log('data.content.response: ', data.content.response);
+      if (data.content && data.content.response === "I can only help with updating Google Calendar.") {
+        console.log("yes");
+      }
+      else {
+        console.log("no");
+      }
+      if (data.content && data.content.response === "I can only help with updating Google Calendar.") {
+        // console.log("TEST");
+        // console.log(data.content.response);
+        setInvalidResponse(true);
+        setCalendarChanges([]); // Clear calendar changes if the response is invalid
+      } else {
+        console.log("test");
+        setApiResponse(data.content || []); // Set response data
+        setCalendarChanges(data.content || []); // Prepare for confirmation
+        setInvalidResponse(false);
+      }
+
+      onOpen(); // Open the modal
     } catch (error) {
       console.error(error);
       setApiResponse(['Error fetching data from Google Gemini API: ' + error.message]);
+      setInvalidResponse(false);
+      onOpen(); // Open the modal even if there's an error
     }
   };
 
@@ -122,7 +143,7 @@ const Dashboard = () => {
           <Button type="submit" colorScheme="blue">Submit</Button>
         </VStack>
 
-        {Array.isArray(apiResponse) && apiResponse.length > 0 && (
+        {Array.isArray(apiResponse) && apiResponse.length > 0 && !invalidResponse && (
           <Text mt={4}>
             Response from Google Gemini:
             {apiResponse.map((item, index) => (
@@ -138,36 +159,56 @@ const Dashboard = () => {
           </Text>
         )}
 
-        <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
+        {!invalidResponse && (
+          <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
+        )}
 
         {/* Confirmation Modal */}
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Confirm Calendar Changes</ModalHeader>
+            <ModalHeader>
+              {invalidResponse ? 'Invalid Response' : 'Confirm Calendar Changes'}
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Text mb={4}>Are you sure you want to make the following changes to your calendar?</Text>
-              <VStack spacing={4}>
-                {calendarChanges.map((change, index) => (
-                  <Box key={index} borderWidth={1} borderRadius="md" p={4}>
-                    <Text fontWeight="bold">{change.summary}</Text>
-                    <Text>{change.description}</Text>
-                    <Text>{change.start} - {change.end}</Text>
-                    <Text color={change.event_type === 'add' ? 'green.500' : 'red.500'}>
-                      {change.event_type}
-                    </Text>
-                  </Box>
-                ))}
-              </VStack>
+              {invalidResponse ? (
+                <Text mb={4}>
+                  The response from the API is not valid for calendar updates. Please return to the dashboard.
+                </Text>
+              ) : (
+                <>
+                  <Text mb={4}>Are you sure you want to make the following changes to your calendar?</Text>
+                  <VStack spacing={4}>
+                    {calendarChanges.map((change, index) => (
+                      <Box key={index} borderWidth={1} borderRadius="md" p={4}>
+                        <Text fontWeight="bold">{change.summary}</Text>
+                        <Text>{change.description}</Text>
+                        <Text>{change.start} - {change.end}</Text>
+                        <Text color={change.event_type === 'add' ? 'green.500' : 'red.500'}>
+                          {change.event_type}
+                        </Text>
+                      </Box>
+                    ))}
+                  </VStack>
+                </>
+              )}
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={createCalendarEvent}>
-                Yes, Confirm
-              </Button>
-              <Button variant="outline" onClick={onClose}>
-                No, Cancel
-              </Button>
+              {invalidResponse ? (
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Return to Dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button colorScheme="blue" mr={3} onClick={createCalendarEvent}>
+                    Yes, Confirm
+                  </Button>
+                  <Button variant="outline" onClick={onClose}>
+                    No, Cancel
+                  </Button>
+                </>
+              )}
             </ModalFooter>
           </ModalContent>
         </Modal>
