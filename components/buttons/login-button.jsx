@@ -1,7 +1,17 @@
+// components/buttons/login-button.js
+import { Button } from '@chakra-ui/react';
+
 export const LoginButton = () => {
-    return (
-      <a className="button__login" href="/api/auth/login">
-        Log In
-      </a>
-    );
-  };
+  return (
+    <Button
+      as="a"
+      href="/api/auth/login"
+      size="lg"
+      colorScheme="teal"
+      variant="solid"
+      _hover={{ bg: 'teal.500', color: 'white' }}
+    >
+      Log In
+    </Button>
+  );
+};

@@ -1,8 +1,28 @@
 // pages/dashboard.js
 import Head from 'next/head';
 import { useState } from 'react';
-import styled from 'styled-components';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Input,
+  Text,
+  useToast,
+  Spinner,
+  VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+} from '@chakra-ui/react';
 import NavBar from '../components/NavBar';
+import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { useUser} from "@auth0/nextjs-auth0/client";
 import { LogoutButton } from '@/components/buttons/logout-button';
 
@@ -66,9 +86,12 @@ const Button = styled.button`
 `;
 
 const Dashboard = () => {
-  
   const [text, setText] = useState('');
-  const [apiResponse, setApiResponse] = useState(null);
+  const [apiResponse, setApiResponse] = useState([]);
+  const [calendarChanges, setCalendarChanges] = useState([]);
+  const [invalidResponse, setInvalidResponse] = useState(false);
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -87,10 +110,22 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      setApiResponse(data.content);
+
+      if (data.content && data.content.response === "I can only help with updating Google Calendar.") {
+        setInvalidResponse(true);
+        setCalendarChanges([]); // Clear calendar changes if the response is invalid
+      } else {
+        setApiResponse(data.content || []); // Set response data
+        setCalendarChanges(data.content || []); // Prepare for confirmation
+        setInvalidResponse(false);
+      }
+
+      onOpen(); // Open the modal
     } catch (error) {
       console.error(error);
-      setApiResponse('Error fetching data from Google Gemini API: ' + error.message);
+      setApiResponse(['Error fetching data from Google Gemini API: ' + error.message]);
+      setInvalidResponse(false);
+      onOpen(); // Open the modal even if there's an error
     }
   };
   
@@ -102,6 +137,7 @@ const Dashboard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ changes: calendarChanges }),
       });
 
       if (!response.ok) {
@@ -109,50 +145,125 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      alert(`Event created: ${data.eventLink}`);
+      toast({
+        title: 'Events processed successfully',
+        description: `Check your Google Calendar for updates.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+
+      onClose(); // Close the modal after successful creation
     } catch (error) {
       console.error(error);
-      alert('Error creating event: ' + error.message);
+      toast({
+        title: 'Error processing events',
+        description: error.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
+  if (isLoading) return <Flex justify="center" align="center" height="100vh"><Spinner size="xl" /></Flex>;
+  if (error) return <Text color="red.500">{error.message}</Text>;
+
   return (
-   
-    <Container>
+    <Container maxW="container.lg" centerContent py={8}>
       <Head>
         <title>Dashboard</title>
         <meta name="description" content="Basic dashboard using Next.js" />
         <link rel="icon" href="/favicon.ico" />
-        
       </Head>
 
       <NavBar />
-      
-      <Main>
-        <Title>Dashboard</Title>
-        <Description>Welcome to your dashboard.</Description>
 
-        <Form onSubmit={handleSubmit}>
+      <Box w="full" p={4} borderWidth={1} borderRadius="lg">
+        <Heading mb={4} textAlign="center">Dashboard</Heading>
+        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}, {user.email}.</Text>
+
+        <VStack as="form" spacing={4} onSubmit={handleSubmit}>
           <Input
-            type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter some text"
           />
-          <Button type="submit">Submit</Button>
-        </Form>
+          <Button type="submit" colorScheme="blue">Submit</Button>
+        </VStack>
 
-        {apiResponse !== null && (
-          <p>Response from Google Gemini: {apiResponse}</p>
+        {Array.isArray(apiResponse) && apiResponse.length > 0 && !invalidResponse && (
+          <Text mt={4}>
+            Response from Google Gemini:
+            {apiResponse.map((item, index) => (
+              <Box key={index} borderWidth={1} borderRadius="md" p={4} mb={2}>
+                <Text fontWeight="bold">{item.summary}</Text>
+                <Text>{item.description}</Text>
+                <Text>{item.start} - {item.end}</Text>
+                <Text color={item.event_type === 'create' ? 'green.500' : 'red.500'}>
+                  {item.event_type}
+                </Text>
+              </Box>
+            ))}
+          </Text>
         )}
 
-        <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
-        
-        
-        <LogoutButton></LogoutButton>
-      </Main>
+        {!invalidResponse && (
+          <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
+        )}
+
+        {/* Confirmation Modal */}
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              {invalidResponse ? 'Invalid Response' : 'Confirm Calendar Changes'}
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {invalidResponse ? (
+                <Text mb={4}>
+                  The response from the API is not valid for calendar updates. Please return to the dashboard.
+                </Text>
+              ) : (
+                <>
+                  <Text mb={4}>Are you sure you want to make the following changes to your calendar?</Text>
+                  <VStack spacing={4}>
+                    {calendarChanges.map((change, index) => (
+                      <Box key={index} borderWidth={1} borderRadius="md" p={4}>
+                        <Text fontWeight="bold">{change.summary}</Text>
+                        <Text>{change.description}</Text>
+                        <Text>{change.start} - {change.end}</Text>
+                        <Text color={change.event_type === 'create' ? 'green.500' : 'red.500'}>
+                          {change.event_type}
+                        </Text>
+                      </Box>
+                    ))}
+                  </VStack>
+                </>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              {invalidResponse ? (
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Return to Dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button colorScheme="blue" mr={3} onClick={createCalendarEvent}>
+                    Yes, Confirm
+                  </Button>
+                  <Button variant="outline" onClick={onClose}>
+                    No, Cancel
+                  </Button>
+                </>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
     </Container>
   );
 };
 
-export default Dashboard;
+export default withPageAuthRequired(Dashboard);
