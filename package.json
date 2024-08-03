@@ -11,18 +11,25 @@
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
     "@google/generative-ai": "^0.16.0",
+    "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
     "google-auth-library": "^9.13.0",
     "googleapis": "^140.0.1",
     "http-proxy-middleware": "^3.0.0",
-    "next": "14.2.5",
-    "react": "^18",
-    "react-dom": "^18",
-    "styled-components": "^6.1.12"
+    "lucide-react": "^0.424.0",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "styled-components": "^6.1.12",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "^14.2.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1"
   }
