@@ -120,7 +120,7 @@ const Dashboard = () => {
 
       <Box w="full" p={4} borderWidth={1} borderRadius="lg">
         <Heading mb={4} textAlign="center">Dashboard</Heading>
-        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}.</Text>
+        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}, {user.email}.</Text>
 
         <VStack as="form" spacing={4} onSubmit={handleSubmit}>
           <Input
