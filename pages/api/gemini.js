@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       const prompt = `
         You are a helpful AI assistant that specializes in updating Google Calendar.
         If the question is about updating Google Calendar, please answer it.
-        If not, respond with: "{response: I can only help with updating Google Calendar.}"
+        If not, respond with: "I can only help with updating Google Calendar."
         Otherwise, please provide information about Google Calendar events in the following JSON format:
 
         [
@@ -43,18 +43,8 @@ export default async function handler(req, res) {
       const result = await model.generateContent(prompt);
       const responseText = await result.response.text();
 
-      // Attempt to parse the response as JSON
-      let parsedResponse;
-      try {
-        parsedResponse = JSON.parse(responseText);
-        // Check if the parsed response is an array
-        if (!Array.isArray(parsedResponse)) {
-          throw new Error('Parsed response is not an array');
-        }
-      } catch (e) {
-        // If JSON parsing fails or the response is not an array, handle it as a special message
-        parsedResponse = { response: responseText.trim() };
-      }
+      // Parse the JSON response text
+      const parsedResponse = JSON.parse(responseText);
 
       res.status(200).json({ content: parsedResponse });
     } catch (error) {
