@@ -10,7 +10,11 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
+    "@google/generative-ai": "^0.16.0",
     "dotenv": "^16.4.5",
+    "google-auth-library": "^9.13.0",
+    "googleapis": "^140.0.1",
+    "http-proxy-middleware": "^3.0.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
