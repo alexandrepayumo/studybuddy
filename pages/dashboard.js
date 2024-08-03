@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useState } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar';
-import { LogoutButton } from '@/components/buttons/logout-button';
+import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client'; // Ensure correct import
 
 const Container = styled.div`
   display: flex;
@@ -65,6 +65,7 @@ const Button = styled.button`
 `;
 
 const Dashboard = () => {
+  const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState(null);
 
@@ -113,20 +114,22 @@ const Dashboard = () => {
     }
   };
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
   return (
     <Container>
       <Head>
         <title>Dashboard</title>
         <meta name="description" content="Basic dashboard using Next.js" />
         <link rel="icon" href="/favicon.ico" />
-        
       </Head>
 
       <NavBar />
 
       <Main>
         <Title>Dashboard</Title>
-        <Description>Welcome to your dashboard.</Description>
+        <Description>Welcome to your dashboard, {user.name}.</Description>
 
         <Form onSubmit={handleSubmit}>
           <Input
@@ -143,10 +146,9 @@ const Dashboard = () => {
         )}
 
         <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
-        <LogoutButton></LogoutButton>
       </Main>
     </Container>
   );
 };
 
-export default Dashboard;
+export default withPageAuthRequired(Dashboard); // Wrap Dashboard with withPageAuthRequired
