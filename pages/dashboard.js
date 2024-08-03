@@ -12,6 +12,14 @@ import {
   useToast,
   Spinner,
   VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from '@chakra-ui/react';
 import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
@@ -19,8 +27,13 @@ import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
-  const [apiResponse, setApiResponse] = useState(null);
+  const [apiResponse, setApiResponse] = useState([]);
+  const [calendarChanges, setCalendarChanges] = useState([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isErrorOpen, onOpen: onErrorOpen, onClose: onErrorClose } = useDisclosure();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -39,10 +52,20 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      setApiResponse(data.content);
+
+      if (data.content.response) {
+        // Handle special message
+        setErrorMessage(data.content.response);
+        onErrorOpen();
+      } else {
+        // Handle JSON array of events
+        setApiResponse(data.content || []);
+        setCalendarChanges(data.content || []);
+        onOpen(); // Open the confirmation dialog
+      }
     } catch (error) {
       console.error(error);
-      setApiResponse('Error fetching data from Google Gemini API: ' + error.message);
+      setApiResponse(['Error fetching data from Google Gemini API: ' + error.message]);
     }
   };
 
@@ -53,6 +76,7 @@ const Dashboard = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ changes: calendarChanges }),
       });
 
       if (!response.ok) {
@@ -67,6 +91,8 @@ const Dashboard = () => {
         duration: 5000,
         isClosable: true,
       });
+
+      onClose(); // Close the modal after successful creation
     } catch (error) {
       console.error(error);
       toast({
@@ -105,11 +131,72 @@ const Dashboard = () => {
           <Button type="submit" colorScheme="blue">Submit</Button>
         </VStack>
 
-        {apiResponse !== null && (
-          <Text mt={4}>Response from Google Gemini: {apiResponse}</Text>
+        {Array.isArray(apiResponse) && apiResponse.length > 0 && (
+          <Text mt={4}>
+            Response from Google Gemini:
+            {apiResponse.map((item, index) => (
+              <Box key={index} borderWidth={1} borderRadius="md" p={4} mb={2}>
+                <Text fontWeight="bold">{item.summary}</Text>
+                <Text>{item.description}</Text>
+                <Text>{item.start} - {item.end}</Text>
+                <Text color={item.event_type === 'add' ? 'green.500' : 'red.500'}>
+                  {item.event_type}
+                </Text>
+              </Box>
+            ))}
+          </Text>
         )}
 
-        <Button mt={4} colorScheme="green" onClick={createCalendarEvent}>Create Calendar Event</Button>
+        <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
+
+        {/* Confirmation Modal */}
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Confirm Calendar Changes</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text mb={4}>Are you sure you want to make the following changes to your calendar?</Text>
+              <VStack spacing={4}>
+                {calendarChanges.map((change, index) => (
+                  <Box key={index} borderWidth={1} borderRadius="md" p={4}>
+                    <Text fontWeight="bold">{change.summary}</Text>
+                    <Text>{change.description}</Text>
+                    <Text>{change.start} - {change.end}</Text>
+                    <Text color={change.event_type === 'add' ? 'green.500' : 'red.500'}>
+                      {change.event_type}
+                    </Text>
+                  </Box>
+                ))}
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={createCalendarEvent}>
+                Yes, Confirm
+              </Button>
+              <Button variant="outline" onClick={onClose}>
+                No, Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Error Modal */}
+        <Modal isOpen={isErrorOpen} onClose={onErrorClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Information</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>{errorMessage}</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={onErrorClose}>
+                Go Back to Dashboard
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </Container>
   );
