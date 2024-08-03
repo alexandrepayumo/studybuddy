@@ -29,7 +29,6 @@ const Dashboard = () => {
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState([]);
   const [calendarChanges, setCalendarChanges] = useState([]);
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [invalidResponse, setInvalidResponse] = useState(false);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -51,22 +50,11 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      console.log('API response:', data); // Log the response for debugging
-      console.log('data.content: ', data.content);
-      console.log('data.content.response: ', data.content.response);
+
       if (data.content && data.content.response === "I can only help with updating Google Calendar.") {
-        console.log("yes");
-      }
-      else {
-        console.log("no");
-      }
-      if (data.content && data.content.response === "I can only help with updating Google Calendar.") {
-        // console.log("TEST");
-        // console.log(data.content.response);
         setInvalidResponse(true);
         setCalendarChanges([]); // Clear calendar changes if the response is invalid
       } else {
-        console.log("test");
         setApiResponse(data.content || []); // Set response data
         setCalendarChanges(data.content || []); // Prepare for confirmation
         setInvalidResponse(false);
@@ -97,8 +85,8 @@ const Dashboard = () => {
 
       const data = await response.json();
       toast({
-        title: 'Event created',
-        description: `Event created: ${data.eventLink}`,
+        title: 'Events processed successfully',
+        description: `Check your Google Calendar for updates.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -108,7 +96,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error creating event',
+        title: 'Error processing events',
         description: error.message,
         status: 'error',
         duration: 5000,
@@ -151,7 +139,7 @@ const Dashboard = () => {
                 <Text fontWeight="bold">{item.summary}</Text>
                 <Text>{item.description}</Text>
                 <Text>{item.start} - {item.end}</Text>
-                <Text color={item.event_type === 'add' ? 'green.500' : 'red.500'}>
+                <Text color={item.event_type === 'create' ? 'green.500' : 'red.500'}>
                   {item.event_type}
                 </Text>
               </Box>
@@ -185,7 +173,7 @@ const Dashboard = () => {
                         <Text fontWeight="bold">{change.summary}</Text>
                         <Text>{change.description}</Text>
                         <Text>{change.start} - {change.end}</Text>
-                        <Text color={change.event_type === 'add' ? 'green.500' : 'red.500'}>
+                        <Text color={change.event_type === 'create' ? 'green.500' : 'red.500'}>
                           {change.event_type}
                         </Text>
                       </Box>
