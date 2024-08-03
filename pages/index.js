@@ -67,7 +67,7 @@ export default function Home() {
           This is a basic landing page created with Next.js.
         </Description>
 
-        <Button href="#get-started">Get Started</Button>
+        <Button href="/api/auth/login">Login</Button>
       </Main>
     </Container>
   );
