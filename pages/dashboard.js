@@ -1,73 +1,26 @@
 // pages/dashboard.js
 import Head from 'next/head';
 import { useState } from 'react';
-import styled from 'styled-components';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Input,
+  Text,
+  useToast,
+  Spinner,
+  VStack,
+} from '@chakra-ui/react';
 import NavBar from '../components/NavBar';
-import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client'; // Ensure correct import
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 0 2rem;
-`;
-
-const Main = styled.main`
-  padding: 5rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Title = styled.h1`
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-  text-align: center;
-`;
-
-const Description = styled.p`
-  text-align: center;
-  font-size: 1.5rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
-`;
-
-const Input = styled.input`
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  width: 100%;
-  max-width: 300px;
-`;
-
-const Button = styled.button`
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #005bb5;
-  }
-`;
+import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState(null);
+  const toast = useToast();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -107,18 +60,30 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      alert(`Event created: ${data.eventLink}`);
+      toast({
+        title: 'Event created',
+        description: `Event created: ${data.eventLink}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error(error);
-      alert('Error creating event: ' + error.message);
+      toast({
+        title: 'Error creating event',
+        description: error.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
+  if (isLoading) return <Flex justify="center" align="center" height="100vh"><Spinner size="xl" /></Flex>;
+  if (error) return <Text color="red.500">{error.message}</Text>;
 
   return (
-    <Container>
+    <Container maxW="container.lg" centerContent py={8}>
       <Head>
         <title>Dashboard</title>
         <meta name="description" content="Basic dashboard using Next.js" />
@@ -127,28 +92,27 @@ const Dashboard = () => {
 
       <NavBar />
 
-      <Main>
-        <Title>Dashboard</Title>
-        <Description>Welcome to your dashboard, {user.name}.</Description>
+      <Box w="full" p={4} borderWidth={1} borderRadius="lg">
+        <Heading mb={4} textAlign="center">Dashboard</Heading>
+        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}.</Text>
 
-        <Form onSubmit={handleSubmit}>
+        <VStack as="form" spacing={4} onSubmit={handleSubmit}>
           <Input
-            type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter some text"
           />
-          <Button type="submit">Submit</Button>
-        </Form>
+          <Button type="submit" colorScheme="blue">Submit</Button>
+        </VStack>
 
         {apiResponse !== null && (
-          <p>Response from Google Gemini: {apiResponse}</p>
+          <Text mt={4}>Response from Google Gemini: {apiResponse}</Text>
         )}
 
-        <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
-      </Main>
+        <Button mt={4} colorScheme="green" onClick={createCalendarEvent}>Create Calendar Event</Button>
+      </Box>
     </Container>
   );
 };
 
-export default withPageAuthRequired(Dashboard); // Wrap Dashboard with withPageAuthRequired
+export default withPageAuthRequired(Dashboard);
