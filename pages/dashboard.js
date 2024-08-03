@@ -3,7 +3,8 @@ import Head from 'next/head';
 import { useState } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar';
-import { LogoutButton } from '@/components/buttons/logout-button';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client'; // Import withPageAuthRequired
+import { useUser } from '@auth0/nextjs-auth0/client'; // Import withPageAuthRequired
 
 const Container = styled.div`
   display: flex;
@@ -65,6 +66,11 @@ const Button = styled.button`
 `;
 
 const Dashboard = () => {
+  const { user, error, isLoading } = useUser();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState(null);
 
@@ -113,40 +119,41 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <Container>
-      <Head>
-        <title>Dashboard</title>
-        <meta name="description" content="Basic dashboard using Next.js" />
-        <link rel="icon" href="/favicon.ico" />
-        
-      </Head>
-
-      <NavBar />
-
-      <Main>
-        <Title>Dashboard</Title>
-        <Description>Welcome to your dashboard.</Description>
-
-        <Form onSubmit={handleSubmit}>
-          <Input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Enter some text"
-          />
-          <Button type="submit">Submit</Button>
-        </Form>
-
-        {apiResponse !== null && (
-          <p>Response from Google Gemini: {apiResponse}</p>
-        )}
-
-        <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
-        <LogoutButton></LogoutButton>
-      </Main>
-    </Container>
-  );
+  if (user) {
+    return (
+      <Container>
+        <Head>
+          <title>Dashboard</title>
+          <meta name="description" content="Basic dashboard using Next.js" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+  
+        <NavBar />
+  
+        <Main>
+          <Title>Dashboard</Title>
+          <Description>Welcome to your dashboard.</Description>
+  
+          <Form onSubmit={handleSubmit}>
+            <Input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Enter some text"
+            />
+            <Button type="submit">Submit</Button>
+          </Form>
+  
+          {apiResponse !== null && (
+            <p>Response from Google Gemini: {apiResponse}</p>
+          )}
+  
+          <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
+        </Main>
+      </Container>
+    );
+  }
 };
 
-export default Dashboard;
+// export default Dashboard;
+export default withPageAuthRequired(Dashboard); // Wrap Dashboard with withPageAuthRequired
