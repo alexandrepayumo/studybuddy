@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       const prompt = `
         You are a helpful AI assistant that specializes in updating Google Calendar.
         If the question is about updating Google Calendar, please answer it.
-        If not, respond with: "I can only help with updating Google Calendar."
+        If the question is not about google calendar, respond with the following json: { "response": "I can only help with updating Google Calendar." }
         Otherwise, please provide information about Google Calendar events in the following JSON format:
 
         [
