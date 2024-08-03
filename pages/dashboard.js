@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useState } from 'react';
 import styled from 'styled-components';
 import NavBar from '../components/NavBar';
+import { LogoutButton } from '@/components/buttons/logout-button';
 
 const Container = styled.div`
   display: flex;
@@ -118,6 +119,7 @@ const Dashboard = () => {
         <title>Dashboard</title>
         <meta name="description" content="Basic dashboard using Next.js" />
         <link rel="icon" href="/favicon.ico" />
+        
       </Head>
 
       <NavBar />
@@ -141,6 +143,7 @@ const Dashboard = () => {
         )}
 
         <Button onClick={createCalendarEvent}>Create Calendar Event</Button>
+        <LogoutButton></LogoutButton>
       </Main>
     </Container>
   );

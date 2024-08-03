@@ -1,6 +1,7 @@
 // pages/index.js
 import Head from 'next/head';
 import styled from 'styled-components';
+import { LoginButton } from '@/components/buttons/login-button';
 
 const Container = styled.div`
   display: flex;
@@ -66,8 +67,8 @@ export default function Home() {
         <Description>
           This is a basic landing page created with Next.js.
         </Description>
-
-        <Button href="/api/auth/login">Login</Button>
+        <LoginButton></LoginButton>
+       
       </Main>
     </Container>
   );
