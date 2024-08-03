@@ -12,7 +12,33 @@ export default async function handler(req, res) {
         generationConfig: { responseMimeType: "application/json" }
       });
 
-      const result = await model.generateContent(text);
+      // Add a custom instruction to guide Gemini
+      const prompt = `
+        You are a helpful AI assistant that specializes in updating Google Calendar.
+        Please provide information about Google Calendar events in the following JSON format:
+
+        [
+          {
+            "summary": "Summary of the event",
+            "description": "Description of the event",
+            "start": "Start time and date of the event (e.g., 2024-03-10T10:00:00-07:00)",
+            "end": "End time and date of the event (e.g., 2024-03-10T12:00:00-07:00)",
+            "event_type": "start/stop/modify" // Specify whether the event is being created, cancelled, or modified
+          },
+          {
+            "summary": "Summary of another event",
+            "description": "Description of another event",
+            "start": "Start time and date of another event",
+            "end": "End time and date of another event",
+            "event_type": "add/delete/modify" 
+          }
+          // ... more events in the same format
+        ]
+
+        Question: ${text}
+      `;
+
+      const result = await model.generateContent(prompt);
       const responseText = await result.response.text();
 
       res.status(200).json({ content: responseText });

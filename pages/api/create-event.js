@@ -16,6 +16,7 @@ export default async function handler(req, res) {
       });
 
       const calendar = google.calendar({ version: 'v3', auth });
+      //FIX THIS TO BE DYNAMIC BASED ON LOGIN INFORMATION
       const calendarId = 'alexandrepayumo123@gmail.com'; // Use your calendar ID here
 
       const event = {
