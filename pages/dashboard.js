@@ -149,7 +149,7 @@ const Dashboard = () => {
           </Text>
         )}
 
-        {!invalidResponse && (
+        {/* {!invalidResponse && (
           <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
         )}
         <LogoutButton />

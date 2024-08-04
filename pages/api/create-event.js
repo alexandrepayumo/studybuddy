@@ -2,10 +2,20 @@
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
 import path from 'path';
+// import { getSession } from '@auth0/nextjs-auth0/edge';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
+      const { getSession } = await import('@auth0/nextjs-auth0');
+      const session = await getSession(req, res);
+
+      if (!session) {
+        return res.status(401).json({ error: 'User is not authenticated' });
+      }
+
+      const user = session.user;
+
       const SCOPES = ['https://www.googleapis.com/auth/calendar'];
       const serviceAccountPath = path.join(process.cwd(), process.env.GOOGLE_SERVICE_ACCOUNT_FILE);
       const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf-8'));
@@ -16,9 +26,8 @@ export default async function handler(req, res) {
       });
 
       const calendar = google.calendar({ version: 'v3', auth });
-      //FIX THIS TO BE DYNAMIC BASED ON LOGIN INFORMATION
-      //GET this from api/auth/me
-      const calendarId = 'alexandrepayumo123@gmail.com'; // Use your calendar ID here
+      // const calendarId = 'alexandrepayumo123@gmail.com'; // Use your calendar ID here
+      const calendarId = user.email;
 
       const { changes } = req.body;
 
