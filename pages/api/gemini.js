@@ -12,10 +12,17 @@ export default async function handler(req, res) {
         generationConfig: { responseMimeType: "application/json" }
       });
 
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
       // Add a custom instruction to guide Gemini
       const prompt = `
         You are a helpful AI assistant that specializes in updating Google Calendar.
         If the question is about updating Google Calendar, please answer it.
+        If the user does not specify which date they would like to begin scheduling their tasks, then assume that the date to start is the after the current day: ${formattedDate}
         If the question is not about google calendar, respond with the following json: { "response": "I can only help with updating Google Calendar." }
         Otherwise, please provide information about Google Calendar events in the following JSON format:
 
