@@ -1,4 +1,3 @@
-// pages/api/create-event.js
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
 import path from 'path';
@@ -100,14 +99,23 @@ export default async function handler(req, res) {
           console.log(`Event created: ${response.data.htmlLink}`);
 
         } else if (event_type === 'delete') {
+          // Convert start and end to DateTime objects
+          const startDate = DateTime.fromISO(start);
+          const endDate = DateTime.fromISO(end);
+
+          // Set timeMin and timeMax to the start and end of the day
+          const timeMin = startDate.startOf('day').toISO();
+          const timeMax = endDate.endOf('day').toISO();
+
           // List events within the time range to find the event to delete
           const eventsList = await calendar.events.list({
             calendarId,
-            timeMin: start,
-            timeMax: end,
+            timeMin,
+            timeMax,
+            q: summary,
           });
 
-          const eventToDelete = eventsList.data.items.find(event => 
+          const eventToDelete = eventsList.data.items.find(event =>
             event.summary.toLowerCase() === summary.toLowerCase()
           );
 
@@ -122,15 +130,22 @@ export default async function handler(req, res) {
           }
 
         } else if (event_type === 'modify') {
+          // Convert start and end to DateTime objects
+          const startDate = DateTime.fromISO(start);
+          const endDate = DateTime.fromISO(end);
+
+          // Set timeMin and timeMax to the start and end of the day
+          const timeMin = startDate.startOf('day').toISO();
+          const timeMax = endDate.endOf('day').toISO();
           // List events within the time range to find the event to modify
           const eventsList = await calendar.events.list({
             calendarId,
+            timeMin,
+            timeMax,
             q: summary,
-            timeMin: start,
-            timeMax: end,
           });
 
-          const eventToModify = eventsList.data.items.find(event => 
+          const eventToModify = eventsList.data.items.find(event =>
             event.summary.toLowerCase() === summary.toLowerCase()
           );
 

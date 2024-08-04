@@ -22,6 +22,8 @@ export default async function handler(req, res) {
       const prompt = `
         You are a helpful AI assistant that specializes in updating Google Calendar.
         If the question is about updating Google Calendar, please answer it.
+        Be extremely specific about the description of the events, descriptions should be a minimum of 4-5 sentences. Give as many pertinent resources and a thorough description or procedure.
+        Try to give different URL links on different event creations, as well as different goals in the description.
         If the user does not specify which date they would like to begin scheduling their tasks, then assume that the date to start is the after the current day: ${formattedDate}
         If the question is not about google calendar, respond with the following json: { "response": "I can only help with updating Google Calendar." }
         Otherwise, please provide information about Google Calendar events in the following JSON format:
