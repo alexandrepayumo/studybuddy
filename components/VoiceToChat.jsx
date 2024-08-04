@@ -79,7 +79,7 @@ const VoiceToChat = () => {
         .microphone-button {
           background-color: ${isListening ? 'red' : 'green'};
           border: none;
-          border-radius: 50%;
+          border-radius: 10%;
           padding: 10px;
           color: white;
           cursor: pointer;
@@ -88,12 +88,7 @@ const VoiceToChat = () => {
         .microphone-button:focus {
           outline: none;
         }
-        p {
-          margin-top: 10px;
-          font-size: 1rem;
-          text-align: right;
-          width: 100%;
-        }
+        
       `}</style>
     </div>
   );
