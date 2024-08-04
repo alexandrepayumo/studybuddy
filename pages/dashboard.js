@@ -193,9 +193,11 @@ const Dashboard = () => {
             ))}
           </Box>
         )}
-
+        {/* {!invalidResponse && (
+          <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
+        )}
+        {/* Confirmation Modal */}
         {/* <LogoutButton /> */}
-        
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent bg={useColorModeValue('white', 'gray.800')}>
