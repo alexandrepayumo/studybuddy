@@ -193,9 +193,8 @@ const Dashboard = () => {
             ))}
           </Box>
         )}
-
+        {/* Confirmation Modal */}
         {/* <LogoutButton /> */}
-        
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent bg={useColorModeValue('white', 'gray.800')}>
