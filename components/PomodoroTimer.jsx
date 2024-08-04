@@ -44,13 +44,19 @@ const PomodoroTimer = () => {
 
   return (
     <Box
-      className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 to-blue-600"
+      className="flex flex-col items-center justify-center h-screen"
+      style={{
+        backgroundColor: '#4A90E2', // Solid bluish background color
+      }}
       p={4}
     >
       <Text
         className="text-6xl mb-8 text-white font-bold"
         fontSize="6xl"
         textAlign="center"
+        style={{
+          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+        }}
       >
         {`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`}
       </Text>
@@ -73,7 +79,7 @@ const PomodoroTimer = () => {
         </Button>
       </HStack>
       <VStack mt={8} className="text-white">
-        <Text fontSize="xl" className="font-semibold">
+        <Text fontSize="xl" className="font-semibold" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
           {isBreak ? 'Break Time!' : 'Focus Time'}
         </Text>
       </VStack>
