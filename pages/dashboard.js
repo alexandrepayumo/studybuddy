@@ -25,6 +25,8 @@ import { LoginButton } from '@/components/buttons/login-button';
 import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { LogoutButton } from '@/components/buttons/logout-button';
+import PomodoroTimer from '../components/PomodoroTimer';
+
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
@@ -122,7 +124,7 @@ const Dashboard = () => {
 
       <Box w="full" p={4} borderWidth={1} borderRadius="lg">
         <Heading mb={4} textAlign="center">Dashboard</Heading>
-        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}, {user.email}.</Text>
+        <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}.</Text>
 
         <VStack as="form" spacing={4} onSubmit={handleSubmit}>
           <Input
@@ -156,6 +158,7 @@ const Dashboard = () => {
         
         {/* Confirmation Modal */}
         <LogoutButton />
+        <PomodoroTimer />
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
