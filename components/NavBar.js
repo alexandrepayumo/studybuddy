@@ -25,6 +25,7 @@ const NavBar = () => {
     <Nav>
       <NavLink href="/">Home</NavLink>
       <NavLink href="/dashboard">Dashboard</NavLink>
+      <NavLink href="/api/auth/logout">Logout</NavLink>
     </Nav>
   );
 };
