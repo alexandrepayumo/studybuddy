@@ -194,7 +194,7 @@ const Dashboard = () => {
           </Box>
         )}
 
-        <LogoutButton />
+        {/* <LogoutButton /> */}
         
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
