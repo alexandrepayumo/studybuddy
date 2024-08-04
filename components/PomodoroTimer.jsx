@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Button, Box, Text, VStack, HStack } from '@chakra-ui/react';
 
 const PomodoroTimer = () => {
   const [seconds, setSeconds] = useState(0);
@@ -42,25 +43,41 @@ const PomodoroTimer = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="text-6xl mb-8">
+    <Box
+      className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-400 to-blue-600"
+      p={4}
+    >
+      <Text
+        className="text-6xl mb-8 text-white font-bold"
+        fontSize="6xl"
+        textAlign="center"
+      >
         {`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`}
-      </div>
-      <div className="flex space-x-4">
-        <button
+      </Text>
+      <HStack spacing={4}>
+        <Button
           onClick={() => setIsActive(!isActive)}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          colorScheme={isActive ? 'orange' : 'green'}
+          size="lg"
+          className="px-4 py-2 text-white rounded"
         >
           {isActive ? 'Pause' : 'Start'}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={resetTimer}
-          className="px-4 py-2 bg-red-500 text-white rounded"
+          colorScheme="red"
+          size="lg"
+          className="px-4 py-2 text-white rounded"
         >
           Reset
-        </button>
-      </div>
-    </div>
+        </Button>
+      </HStack>
+      <VStack mt={8} className="text-white">
+        <Text fontSize="xl" className="font-semibold">
+          {isBreak ? 'Break Time!' : 'Focus Time'}
+        </Text>
+      </VStack>
+    </Box>
   );
 };
 
