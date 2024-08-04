@@ -26,6 +26,7 @@ import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { LogoutButton } from '@/components/buttons/logout-button';
 import PomodoroTimer from '../components/PomodoroTimer';
+import VoiceToChat from '../components/VoiceToChat';
 
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
@@ -131,7 +132,10 @@ const Dashboard = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter some text"
-          />
+          /> 
+          <div>
+          <VoiceToChat />
+         </div>
           <Button type="submit" colorScheme="blue">Submit</Button>
         </VStack>
 
@@ -208,7 +212,8 @@ const Dashboard = () => {
           </ModalContent>
         </Modal>
       </Box>
-      <PomodoroTimer />
+     
+      <div><PomodoroTimer /></div>
     </Container>
   );
 };
