@@ -1,14 +1,14 @@
 import Head from 'next/head';
 import { Box, Container, Heading, Image, Text, VStack, HStack, Flex, Icon, useBreakpointValue } from '@chakra-ui/react';
 import { LoginButton } from '@/components/buttons/login-button';
-import { FaNodeJs, FaGoogle, FaCalendarAlt } from 'react-icons/fa'; // Import icons directly from react-icons
-import { SiNextdotjs } from 'react-icons/si';
+import { FaGoogle, FaCalendarAlt } from 'react-icons/fa'; // Import icons directly from react-icons
+import { SiNextdotjs, SiAuth0 } from 'react-icons/si';
 // import googleCalendarImage from '/google-calendar.png'; // Ensure the path is correct
 
 const technologies = [
   { name: 'Next.js', icon: SiNextdotjs },
-  { name: 'Auth0', icon: FaGoogle },
-  { name: 'Google Gemini', icon: FaNodeJs },
+  { name: 'Auth0', icon: SiAuth0 },
+  { name: 'Google Gemini', icon: FaGoogle },
   { name: 'Google Calendar', icon: FaCalendarAlt },
 ];
 
@@ -53,10 +53,11 @@ export default function Home() {
           borderTopColor="gray.200"
         >
           <Image
-            src='/google-calender.png'
+            src='/google-calendar.png'
             alt="Google Calendar with meeting events"
             borderRadius="md"
             boxShadow="md"
+            width={400}
           />
           <Box ml={{ base: 0, md: 8 }} textAlign={{ base: 'center', md: 'left' }}>
             <Heading as="h2" size="lg" mb={4}>

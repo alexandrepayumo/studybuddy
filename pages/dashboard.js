@@ -158,7 +158,7 @@ const Dashboard = () => {
           <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
         )}
         {/* Confirmation Modal */}
-        <LogoutButton />
+        {/* <LogoutButton /> */}
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
