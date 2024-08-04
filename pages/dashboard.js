@@ -158,7 +158,7 @@ const Dashboard = () => {
         
         {/* Confirmation Modal */}
         <LogoutButton />
-        <PomodoroTimer />
+        
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
@@ -208,6 +208,7 @@ const Dashboard = () => {
           </ModalContent>
         </Modal>
       </Box>
+      <PomodoroTimer />
     </Container>
   );
 };
