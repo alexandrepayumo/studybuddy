@@ -1,4 +1,3 @@
-// pages/dashboard.js
 import Head from 'next/head';
 import { useState } from 'react';
 import {
@@ -23,6 +22,7 @@ import {
 } from '@chakra-ui/react';
 import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
+import { DateTime } from 'luxon';
 
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
@@ -138,7 +138,13 @@ const Dashboard = () => {
               <Box key={index} borderWidth={1} borderRadius="md" p={4} mb={2}>
                 <Text fontWeight="bold">{item.summary}</Text>
                 <Text>{item.description}</Text>
-                <Text>{item.start} - {item.end}</Text>
+                <Text>
+                  {item.event_type === 'create' ? (
+                    `${DateTime.fromISO(item.start).toLocaleString(DateTime.DATETIME_FULL)} - ${DateTime.fromISO(item.end).toLocaleString(DateTime.DATETIME_FULL)}`
+                  ) : (
+                    `${DateTime.fromISO(item.start).toLocaleString(DateTime.DATE_SHORT)}`
+                  )}
+                </Text>
                 <Text color={item.event_type === 'create' ? 'green.500' : 'red.500'}>
                   {item.event_type}
                 </Text>
@@ -146,10 +152,6 @@ const Dashboard = () => {
             ))}
           </Text>
         )}
-
-        {/* {!invalidResponse && (
-          <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
-        )} */}
 
         {/* Confirmation Modal */}
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -172,7 +174,13 @@ const Dashboard = () => {
                       <Box key={index} borderWidth={1} borderRadius="md" p={4}>
                         <Text fontWeight="bold">{change.summary}</Text>
                         <Text>{change.description}</Text>
-                        <Text>{change.start} - {change.end}</Text>
+                        <Text>
+                          {change.event_type === 'create' ? (
+                            `${DateTime.fromISO(change.start).toLocaleString(DateTime.DATETIME_FULL)} - ${DateTime.fromISO(change.end).toLocaleString(DateTime.DATETIME_FULL)}`
+                          ) : (
+                            `${DateTime.fromISO(change.start).toLocaleString(DateTime.DATE_SHORT)}`
+                          )}
+                        </Text>
                         <Text color={change.event_type === 'create' ? 'green.500' : 'red.500'}>
                           {change.event_type}
                         </Text>

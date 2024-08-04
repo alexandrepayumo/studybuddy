@@ -2,7 +2,7 @@
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
 import path from 'path';
-// import { getSession } from '@auth0/nextjs-auth0/edge';
+import { DateTime } from 'luxon'; // Assuming you're using Luxon for date-time manipulation
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -26,31 +26,73 @@ export default async function handler(req, res) {
       });
 
       const calendar = google.calendar({ version: 'v3', auth });
-      // const calendarId = 'alexandrepayumo123@gmail.com'; // Use your calendar ID here
       const calendarId = user.email;
 
       const { changes } = req.body;
 
-      // console.log(changes);
       for (const change of changes) {
         const { summary, description, start, end, event_type } = change;
-        console.log(change);
 
         if (event_type === 'create') {
-          // console.log("Creating an event");
+          // Check for conflicting events
+          const eventsList = await calendar.events.list({
+            calendarId,
+            timeMin: start,
+            timeMax: end,
+            singleEvents: true,
+            orderBy: 'startTime',
+          });
+
+          let events = eventsList.data.items;
+          let eventStart = DateTime.fromISO(start);
+          let eventEnd = DateTime.fromISO(end);
+
+          // Find a free time slot if there's a conflict
+          let slotFound = false;
+          while (!slotFound) {
+            const conflictingEvent = events.find(event => {
+              const eventStartTime = DateTime.fromISO(event.start.dateTime);
+              const eventEndTime = DateTime.fromISO(event.end.dateTime);
+              return (
+                (eventStartTime >= eventStart && eventStartTime < eventEnd) ||
+                (eventEndTime > eventStart && eventEndTime <= eventEnd) ||
+                (eventStartTime <= eventStart && eventEndTime >= eventEnd)
+              );
+            });
+
+            if (conflictingEvent) {
+              // Adjust the start and end times to find the next available slot
+              eventStart = DateTime.fromISO(conflictingEvent.end.dateTime).plus({ minutes: 15 });
+              eventEnd = eventStart.plus({ hours: 1 }); // Example: Add 1 hour, adjust as needed
+
+              // Update events list for the new slot
+              const updatedEventsList = await calendar.events.list({
+                calendarId,
+                timeMin: eventStart.toISO(),
+                timeMax: eventEnd.toISO(),
+                singleEvents: true,
+                orderBy: 'startTime',
+              });
+              events = updatedEventsList.data.items;
+            } else {
+              slotFound = true;
+            }
+          }
+
           const event = {
             summary,
             description,
             start: {
-              dateTime: start,
+              dateTime: eventStart.toISO(),
               timeZone: 'America/Toronto',
             },
             end: {
-              dateTime: end,
+              dateTime: eventEnd.toISO(),
               timeZone: 'America/Toronto',
             },
           };
 
+          // Insert the event
           const response = await calendar.events.insert({
             calendarId,
             resource: event,
@@ -58,14 +100,16 @@ export default async function handler(req, res) {
           console.log(`Event created: ${response.data.htmlLink}`);
 
         } else if (event_type === 'delete') {
+          // List events within the time range to find the event to delete
           const eventsList = await calendar.events.list({
             calendarId,
-            q: summary,
             timeMin: start,
             timeMax: end,
           });
 
-          const eventToDelete = eventsList.data.items.find(event => event.summary === summary);
+          const eventToDelete = eventsList.data.items.find(event => 
+            event.summary.toLowerCase() === summary.toLowerCase()
+          );
 
           if (eventToDelete) {
             await calendar.events.delete({
@@ -78,6 +122,7 @@ export default async function handler(req, res) {
           }
 
         } else if (event_type === 'modify') {
+          // List events within the time range to find the event to modify
           const eventsList = await calendar.events.list({
             calendarId,
             q: summary,
@@ -85,7 +130,9 @@ export default async function handler(req, res) {
             timeMax: end,
           });
 
-          const eventToModify = eventsList.data.items.find(event => event.summary === summary);
+          const eventToModify = eventsList.data.items.find(event => 
+            event.summary.toLowerCase() === summary.toLowerCase()
+          );
 
           if (eventToModify) {
             const updatedEvent = {
