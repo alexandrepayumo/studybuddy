@@ -116,7 +116,7 @@ const Dashboard = () => {
   return (
     <Container maxW="container.lg" centerContent py={8}>
       <Head>
-        <title>Dashboard</title>
+        <title>Dashboard </title>
         <meta name="description" content="Basic dashboard using Next.js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -124,7 +124,7 @@ const Dashboard = () => {
       <NavBar />
 
       <Box w="full" p={4} borderWidth={1} borderRadius="lg">
-        <Heading mb={4} textAlign="center">Dashboard </Heading>
+        <Heading mb={4} textAlign="center">Dashboard (Test Version)</Heading>
         <Text mb={4} textAlign="center">Welcome to your dashboard, {user.name}.</Text>
 
         <VStack as="form" spacing={4} onSubmit={handleSubmit}>
