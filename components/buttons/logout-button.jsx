@@ -1,7 +1,17 @@
-export const LogoutButton = () => {
+// components/buttons/logout-button.js
+import { Button } from '@chakra-ui/react';
+
+ export const LogoutButton = () => {
   return (
-    <a className="button__logout" href="/api/auth/logout">
+    <Button
+      as="a"
+      href="/api/auth/logout"
+      size="lg"
+      colorScheme="teal"
+      variant="solid"
+      _hover={{ bg: 'teal.500', color: 'white' }}
+    >
       Log Out
-    </a>
+    </Button>
   );
 };

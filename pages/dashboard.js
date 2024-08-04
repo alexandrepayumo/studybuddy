@@ -21,71 +21,12 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from '@chakra-ui/react';
+import { LoginButton } from '@/components/buttons/login-button';
 import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
-import { useUser} from "@auth0/nextjs-auth0/client";
 import { LogoutButton } from '@/components/buttons/logout-button';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 0 2rem;
-`;
-
-const Main = styled.main`
-  padding: 5rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Title = styled.h1`
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-  text-align: center;
-`;
-
-const Description = styled.p`
-  text-align: center;
-  font-size: 1.5rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
-`;
-
-const Input = styled.input`
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  width: 100%;
-  max-width: 300px;
-`;
-
-const Button = styled.button`
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #005bb5;
-  }
-`;
-
 const Dashboard = () => {
+  const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
   const [apiResponse, setApiResponse] = useState([]);
   const [calendarChanges, setCalendarChanges] = useState([]);
@@ -211,7 +152,8 @@ const Dashboard = () => {
         {!invalidResponse && (
           <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
         )}
-
+        <LogoutButton />
+        
         {/* Confirmation Modal */}
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
