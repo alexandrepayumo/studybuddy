@@ -21,9 +21,10 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from '@chakra-ui/react';
+import { LoginButton } from '@/components/buttons/login-button';
 import NavBar from '../components/NavBar';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
-
+import { LogoutButton } from '@/components/buttons/logout-button';
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
   const [text, setText] = useState('');
@@ -68,6 +69,7 @@ const Dashboard = () => {
       onOpen(); // Open the modal even if there's an error
     }
   };
+  
 
   const createCalendarEvent = async () => {
     try {
@@ -149,8 +151,9 @@ const Dashboard = () => {
 
         {/* {!invalidResponse && (
           <Button mt={4} colorScheme="green" onClick={onOpen}>Create Calendar Event</Button>
-        )} */}
-
+        )}
+        <LogoutButton />
+        
         {/* Confirmation Modal */}
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
